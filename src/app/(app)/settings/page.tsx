@@ -132,7 +132,7 @@ export default function SettingsPage() {
                <Select value={voiceStyle} onValueChange={setVoiceStyle}>
                 <SelectTrigger className="w-full md:w-1/2" id="voice-style">
                   <SelectValue placeholder="Select a voice" />
-                </Trigger>
+                </SelectTrigger>
                 <SelectContent className="glass-effect">
                   <SelectItem value="alloy">Alloy (Warm, Natural)</SelectItem>
                   <SelectItem value="echo">Echo (Crisp, Clear)</SelectItem>
