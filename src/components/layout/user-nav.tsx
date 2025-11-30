@@ -1,6 +1,5 @@
 "use client";
 
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,33 +14,48 @@ import {
 import { ThemeToggle } from "../theme-toggle";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth, useUser } from "@/firebase";
+import { signOut } from "firebase/auth";
 
 export function UserNav() {
   const router = useRouter();
-  const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
-
-  const handleLogout = () => {
-    // In a real app, you'd clear the user's session here.
-    // For this prototype, we'll just navigate to the homepage.
-    router.push("/");
+  const { user } = useUser();
+  const auth = useAuth();
+  
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'AD';
+    const names = name.split(' ');
+    if (names.length > 1) {
+      return `${names[0][0]}${names[names.length - 1][0]}`;
+    }
+    return name.substring(0, 2);
+  }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt="User Avatar" />}
-            <AvatarFallback>AD</AvatarFallback>
+            {user?.photoURL && <AvatarImage src={user.photoURL} alt="User Avatar" />}
+            <AvatarFallback>{getInitials(user?.displayName)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 glass-effect" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Alex Doe</p>
+            <p className="text-sm font-medium leading-none">{user?.displayName || 'Anonymous'}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              alex@example.com
+              {user?.email || 'No email'}
             </p>
           </div>
         </DropdownMenuLabel>

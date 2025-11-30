@@ -4,18 +4,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/firebase";
+import { initiateEmailSignUp } from "@/firebase/non-blocking-login";
 import { Chrome } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import React from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export function SignupForm() {
     const router = useRouter();
+    const auth = useAuth();
+    const { toast } = useToast();
+    const [name, setName] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
 
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
-        // In a real app, you'd handle user creation here.
-        // For this prototype, we'll just navigate to the chat page.
+        initiateEmailSignUp(auth, email, password);
         router.push("/chat");
+    };
+
+    const handleGoogleSignIn = async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+        router.push('/chat');
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong.",
+          description: error.message || "There was a problem with Google sign-in.",
+        });
+      }
     };
 
   return (
@@ -23,15 +46,15 @@ export function SignupForm() {
       <form onSubmit={handleSignup} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" type="text" placeholder="John Doe" required />
+          <Input id="name" type="text" placeholder="John Doe" required value={name} onChange={e => setName(e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={e => setEmail(e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" required />
+          <Input id="password" type="password" required value={password} onChange={e => setPassword(e.target.value)} />
         </div>
         <Button type="submit" className="w-full">
           Create Account
@@ -47,7 +70,7 @@ export function SignupForm() {
           </span>
         </div>
       </div>
-      <Button variant="outline" className="w-full" onClick={() => router.push('/chat')}>
+      <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
         <Chrome className="mr-2 h-4 w-4" />
         Google
       </Button>
