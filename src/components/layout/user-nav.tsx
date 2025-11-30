@@ -1,3 +1,5 @@
+"use client";
+
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,9 +14,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "../theme-toggle";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function UserNav() {
+  const router = useRouter();
   const userAvatar = PlaceHolderImages.find(img => img.id === 'user-avatar');
+
+  const handleLogout = () => {
+    // In a real app, you'd clear the user's session here.
+    // For this prototype, we'll just navigate to the homepage.
+    router.push("/");
+  };
 
   return (
     <DropdownMenu>
@@ -45,7 +55,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           Log out
         </DropdownMenuItem>
         <DropdownMenuSeparator />
