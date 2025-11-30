@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import type { AIPersonality } from "@/lib/data";
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, icons } from 'lucide-react';
 
 interface AISelectorProps {
   personalities: AIPersonality[];
@@ -22,7 +22,9 @@ export function AISelector({ personalities }: AISelectorProps) {
       <CardContent className="h-[calc(100%-4rem)] p-0">
         <ScrollArea className="h-full p-4 pt-0">
           <div className="space-y-2">
-            {personalities.map((p) => (
+            {personalities.map((p) => {
+              const Icon = icons[p.icon];
+              return (
               <button
                 key={p.id}
                 onClick={() => setSelected(p.id)}
@@ -37,14 +39,14 @@ export function AISelector({ personalities }: AISelectorProps) {
                   <CheckCircle className="h-5 w-5 text-primary absolute top-2 right-2"/>
                 )}
                 <div className="flex items-center gap-3">
-                  <p.icon className="h-6 w-6 text-primary" />
+                  {Icon && <Icon className="h-6 w-6 text-primary" />}
                   <div className="flex-1">
                     <p className="font-semibold">{p.name}</p>
                     <p className="text-xs text-muted-foreground">{p.description}</p>
                   </div>
                 </div>
               </button>
-            ))}
+            )})}
           </div>
         </ScrollArea>
       </CardContent>
