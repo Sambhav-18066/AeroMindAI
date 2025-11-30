@@ -66,13 +66,13 @@ export default function SettingsPage() {
   };
 
   const handlePreferencesSave = () => {
-    if (user) {
+    if (user && firestore) {
       const prefs = { personality: defaultPersonality, voice: voiceStyle };
       localStorage.setItem(`userPrefs-${user.uid}`, JSON.stringify(prefs));
-      if (firestore) {
-        const userDocRef = doc(firestore, 'users', user.uid);
-        setDocumentNonBlocking(userDocRef, { preferredAiPersonality: defaultPersonality }, { merge: true });
-      }
+      
+      const userDocRef = doc(firestore, 'users', user.uid);
+      setDocumentNonBlocking(userDocRef, { preferredAiPersonality: defaultPersonality }, { merge: true });
+
       toast({ title: "Preferences saved!" });
     }
   };
