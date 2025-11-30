@@ -34,9 +34,13 @@ export default function SettingsPage() {
       
       const savedPrefs = localStorage.getItem(`userPrefs-${user.uid}`);
       if (savedPrefs) {
-        const { personality, voice } = JSON.parse(savedPrefs);
-        setDefaultPersonality(personality || 'friend');
-        setVoiceStyle(voice || 'alloy');
+        try {
+          const { personality, voice } = JSON.parse(savedPrefs);
+          setDefaultPersonality(personality || 'friend');
+          setVoiceStyle(voice || 'alloy');
+        } catch (e) {
+          console.error("Failed to parse user preferences from localStorage", e);
+        }
       }
     }
   }, [user]);
@@ -50,22 +54,25 @@ export default function SettingsPage() {
           setDocumentNonBlocking(userDocRef, { name }, { merge: true });
         }
         toast({ title: "Profile updated successfully!" });
-      } catch (error: any) {
+      } catch (error) {
+        const e = error as Error;
         toast({
           variant: "destructive",
           title: "Error updating profile",
-          description: error.message,
+          description: e.message,
         });
       }
     }
   };
 
   const handlePreferencesSave = () => {
-    if (user && firestore) {
+    if (user) {
       const prefs = { personality: defaultPersonality, voice: voiceStyle };
       localStorage.setItem(`userPrefs-${user.uid}`, JSON.stringify(prefs));
-      const userDocRef = doc(firestore, 'users', user.uid);
-      setDocumentNonBlocking(userDocRef, { preferredAiPersonality: defaultPersonality }, { merge: true });
+      if (firestore) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        setDocumentNonBlocking(userDocRef, { preferredAiPersonality: defaultPersonality }, { merge: true });
+      }
       toast({ title: "Preferences saved!" });
     }
   };
