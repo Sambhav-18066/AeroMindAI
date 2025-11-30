@@ -37,7 +37,7 @@ export default function Home() {
           </p>
           <div className="mt-8 flex justify-center gap-4">
             <Button asChild size="lg" className="font-bold text-lg">
-              <Link href="/chat">Get Started</Link>
+              <Link href="/signup">Get Started</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="font-bold text-lg bg-background/50 backdrop-blur-sm">
               <Link href="/login">Login</Link>
