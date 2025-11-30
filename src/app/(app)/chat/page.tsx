@@ -22,11 +22,35 @@ const initialMessages: ChatHistories = AI_PERSONALITIES.reduce((acc, p) => {
 
 export default function ChatPage() {
   const { toast } = useToast();
-  const [allMessages, setAllMessages] = useState<ChatHistories>(initialMessages);
+  const [allMessages, setAllMessages] = useState<ChatHistories>({});
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTtsEnabled, setIsTtsEnabled] = useState(false);
   const [selectedPersonality, setSelectedPersonality] = useState(AI_PERSONALITIES[0].id);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    try {
+      const savedMessages = localStorage.getItem('chatHistories');
+      if (savedMessages) {
+        setAllMessages(JSON.parse(savedMessages));
+      } else {
+        setAllMessages(initialMessages);
+      }
+    } catch (error) {
+      console.error("Failed to load messages from localStorage", error);
+      setAllMessages(initialMessages);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (Object.keys(allMessages).length > 0) {
+        localStorage.setItem('chatHistories', JSON.stringify(allMessages));
+      }
+    } catch (error) {
+      console.error("Failed to save messages to localStorage", error);
+    }
+  }, [allMessages]);
 
   const messages = allMessages[selectedPersonality] || [];
 
