@@ -46,22 +46,21 @@ export default function SettingsPage() {
   }, [user]);
 
   const handleProfileSave = async () => {
-    if (user && auth.currentUser) {
-      try {
-        await updateProfile(auth.currentUser, { displayName: name });
-        if (firestore) {
-          const userDocRef = doc(firestore, 'users', user.uid);
-          setDocumentNonBlocking(userDocRef, { name }, { merge: true });
-        }
-        toast({ title: "Profile updated successfully!" });
-      } catch (error) {
-        const e = error as Error;
-        toast({
-          variant: "destructive",
-          title: "Error updating profile",
-          description: e.message,
-        });
+    if (!user || !auth.currentUser) return;
+    try {
+      await updateProfile(auth.currentUser, { displayName: name });
+      if (firestore) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        setDocumentNonBlocking(userDocRef, { name }, { merge: true });
       }
+      toast({ title: "Profile updated successfully!" });
+    } catch (error) {
+      const e = error as Error;
+      toast({
+        variant: "destructive",
+        title: "Error updating profile",
+        description: e.message,
+      });
     }
   };
 
