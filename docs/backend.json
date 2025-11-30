@@ -1,0 +1,356 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user in the SpeakSelf AI application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "URL of the user's avatar image.",
+          "format": "uri"
+        },
+        "englishLevel": {
+          "type": "string",
+          "description": "The user's English proficiency level."
+        },
+        "goals": {
+          "type": "string",
+          "description": "The user's language learning goals."
+        },
+        "preferredAiPersonality": {
+          "type": "string",
+          "description": "The user's preferred AI personality mode."
+        },
+        "themePreference": {
+          "type": "string",
+          "description": "The user's preferred UI theme (light, dark, auto)."
+        },
+        "voiceSpeed": {
+          "type": "number",
+          "description": "The user's preferred voice speed for TTS."
+        },
+        "voicePitch": {
+          "type": "number",
+          "description": "The user's preferred voice pitch for TTS."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "createdAt"
+      ]
+    },
+    "Session": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Session",
+      "type": "object",
+      "description": "Represents a single conversation session between a user and the AI.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the session."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Session)"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Timestamp of when the session started.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Timestamp of when the session ended.",
+          "format": "date-time"
+        },
+        "aiPersonality": {
+          "type": "string",
+          "description": "The AI personality mode used during the session."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "startTime"
+      ]
+    },
+    "Message": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Message",
+      "type": "object",
+      "description": "Represents a single message within a session.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the message."
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Reference to Session. (Relationship: Session 1:N Message)"
+        },
+        "sender": {
+          "type": "string",
+          "description": "Indicates who sent the message (user or ai)."
+        },
+        "text": {
+          "type": "string",
+          "description": "The content of the message."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of when the message was sent.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "sessionId",
+        "sender",
+        "text",
+        "timestamp"
+      ]
+    },
+    "Analytics": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Analytics",
+      "type": "object",
+      "description": "Stores analytical data for a user's sessions.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the analytics data."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Analytics)"
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Reference to Session. (Relationship: Session 1:N Analytics)"
+        },
+        "wordsPerMinute": {
+          "type": "number",
+          "description": "Words spoken per minute during the session."
+        },
+        "lexicalRichness": {
+          "type": "number",
+          "description": "A measure of lexical richness (unique word count / total word count)."
+        },
+        "pauseLength": {
+          "type": "number",
+          "description": "Average length of pauses during the session."
+        },
+        "responseLatency": {
+          "type": "number",
+          "description": "Average time taken for the AI to respond."
+        },
+        "autobiographicalDepthScore": {
+          "type": "number",
+          "description": "A score indicating the depth of autobiographical content."
+        },
+        "narrativeContinuityScore": {
+          "type": "number",
+          "description": "A score indicating the narrative continuity of the session."
+        },
+        "aiVsUserTalkRatio": {
+          "type": "number",
+          "description": "The ratio of AI speech to user speech."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "sessionId"
+      ]
+    },
+    "Summary": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Summary",
+      "type": "object",
+      "description": "Stores the AI-generated summary of a session.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the session summary."
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Reference to Session. (Relationship: Session 1:1 Summary)"
+        },
+        "userFocus": {
+          "type": "string",
+          "description": "What the user primarily talked about during the session."
+        },
+        "aiFocus": {
+          "type": "string",
+          "description": "What the AI primarily focused on during the session."
+        },
+        "identityThemes": {
+          "type": "string",
+          "description": "Key identity themes that emerged during the session."
+        },
+        "emotionalCues": {
+          "type": "string",
+          "description": "Significant emotional cues observed during the session."
+        },
+        "strengths": {
+          "type": "string",
+          "description": "Identified strengths of the user in the conversation."
+        },
+        "weaknesses": {
+          "type": "string",
+          "description": "Identified weaknesses of the user in the conversation."
+        },
+        "improvementSuggestions": {
+          "type": "string",
+          "description": "Personalized suggestions for improvement."
+        },
+        "nextTopics": {
+          "type": "string",
+          "description": "Suggested topics for future conversations."
+        },
+        "confidenceRating": {
+          "type": "number",
+          "description": "A confidence rating for the session."
+        }
+      },
+      "required": [
+        "id",
+        "sessionId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles and preferences. Access is restricted to the authenticated user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching the Firebase Auth UID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/sessions/{sessionId}",
+        "definition": {
+          "entityName": "Session",
+          "schema": {
+            "$ref": "#/backend/entities/Session"
+          },
+          "description": "Stores session metadata for a specific user. Access is restricted to the authenticated user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching the Firebase Auth UID."
+            },
+            {
+              "name": "sessionId",
+              "description": "The unique identifier of the session."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/sessions/{sessionId}/messages/{messageId}",
+        "definition": {
+          "entityName": "Message",
+          "schema": {
+            "$ref": "#/backend/entities/Message"
+          },
+          "description": "Stores messages within a specific session for a user. Access is restricted to the authenticated user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching the Firebase Auth UID."
+            },
+            {
+              "name": "sessionId",
+              "description": "The unique identifier of the session."
+            },
+            {
+              "name": "messageId",
+              "description": "The unique identifier of the message."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/sessions/{sessionId}/summary",
+        "definition": {
+          "entityName": "Summary",
+          "schema": {
+            "$ref": "#/backend/entities/Summary"
+          },
+          "description": "Stores AI-generated summaries for a specific session of a user. Access is restricted to the authenticated user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching the Firebase Auth UID."
+            },
+            {
+              "name": "sessionId",
+              "description": "The unique identifier of the session."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/analytics/{analyticsId}",
+        "definition": {
+          "entityName": "Analytics",
+          "schema": {
+            "$ref": "#/backend/entities/Analytics"
+          },
+          "description": "Stores analytics data for a specific user. Access is restricted to the authenticated user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching the Firebase Auth UID."
+            },
+            {
+              "name": "analyticsId",
+              "description": "The unique identifier of the analytics data."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the SpeakSelf AI application, prioritizing authorization independence, clarity, and scalability. It leverages path-based ownership for user-specific data and avoids `get()` calls in security rules by denormalizing authorization information where needed. \n\n*   `/users/{userId}`: Stores user profiles and preferences. This collection utilizes path-based ownership, ensuring only the authenticated user can access their own profile.\n*   `/users/{userId}/sessions/{sessionId}`: Stores session metadata. This subcollection inherits ownership from the parent `/users/{userId}` document, ensuring that only the user can access their own sessions. No denormalization is required as authorization is based on path.\n*   `/users/{userId}/sessions/{sessionId}/messages/{messageId}`: Stores messages within a session.  Ownership is inherited from the parent `/users/{userId}/sessions/{sessionId}`, again ensuring only the user can access their own messages.  Authorization is based on path.\n*   `/users/{userId}/sessions/{sessionId}/summary`: Stores AI-generated summaries of sessions. Ownership is inherited from the parent `/users/{userId}/sessions/{sessionId}`, ensuring the user is authorized.  Authorization is based on path.\n*   `/users/{userId}/analytics/{analyticsId}`: Stores analytics data for a user's sessions.  Ownership is inherited from the parent `/users/{userId}`, ensuring the user is authorized.  Authorization is based on path.\n\nThis structure promotes Authorization Independence because access control is determined by the document path (path-based ownership) which relies on request.auth.uid. This eliminates the need for `get()` calls in security rules, enabling atomic operations and simplifying debugging. Homogeneous Security Posture is maintained by ensuring each collection only contains documents with the same access requirements.  QAPs are supported because `list` operations are naturally secured by the path-based ownership model; a user can only list the documents within their own path."
+  }
+}

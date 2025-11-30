@@ -1,0 +1,202 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model. All data is considered private and can only be
+ * accessed by the authenticated user who created it. There is no public or shared data.
+ *
+ * Data Structure: All application data is nested under a top-level `/users` collection. Each user's data, including
+ * their profile, sessions, messages, and analytics, is stored in a document tree where the root document ID is the
+ * user's Firebase Authentication UID. For example, all data for a user with UID 'abc' is located under `/users/abc`.
+ *
+ * Key Security Decisions:
+ * - Default Deny: All paths are closed by default. Access is only granted through explicit `allow` statements.
+ * - Strict Ownership: All rules verify that the `request.auth.uid` matches the `{userId}` wildcard in the document path.
+ * - No User Listing: To protect user privacy and prevent data scraping, listing documents in the top-level `/users`
+ *   collection is explicitly forbidden. Users can only fetch their own profile document directly.
+ * - Path-Based Security: Authorization relies entirely on the document path, which is a fast and secure method that avoids
+ *   slow and costly `get()` calls to other documents.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns true if the user is signed into the application.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Returns true if the signed-in user's UID matches the provided userId from the path.
+     * This is the fundamental check for user-owned data.
+     * @param userId The user's UID, typically from the path wildcard.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Returns true if the document exists and the requesting user is the owner.
+     * Used for all state-changing operations (update, delete) to prevent modifying
+     * non-existent data.
+     * @param userId The user's UID from the path wildcard.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * Validates that the `id` field within a User document matches the user's UID on create.
+     * Ensures relational integrity between the document ID and its content.
+     * @param userId The user's UID from the path wildcard.
+     */
+    function hasValidUserProfileId(userId) {
+      return request.resource.data.id == userId;
+    }
+
+    /**
+     * Ensures the `id` field in a User document cannot be changed after creation.
+     */
+    function userProfileIdIsImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+
+    /**
+     * Validates that a new document's `userId` field correctly points back to its parent user path.
+     * @param userId The user's UID from the path wildcard.
+     */
+    function hasValidUserId(userId) {
+      return request.resource.data.userId == userId;
+    }
+
+    /**
+     * Ensures the `userId` field linking a subcollection document to its user is immutable.
+     */
+    function userIdIsImmutable() {
+      return request.resource.data.userId == resource.data.userId;
+    }
+
+    /**
+     * Validates that a new document's `sessionId` field correctly points back to its parent session path.
+     * @param sessionId The session's ID from the path wildcard.
+     */
+    function hasValidSessionId(sessionId) {
+      return request.resource.data.sessionId == sessionId;
+    }
+
+    /**
+     * Ensures the `sessionId` field linking a document to its session is immutable.
+     */
+    function sessionIdIsImmutable() {
+      return request.resource.data.sessionId == resource.data.sessionId;
+    }
+
+    // -------------------------------------------------------------------------
+    // User Profiles
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Manages user profile documents.
+     * @path /users/{userId}
+     * @allow (get) A signed-in user requests their own profile document. auth.uid == userId.
+     * @allow (create) A new user creates their own profile document. auth.uid == userId.
+     * @deny (list) Any user, including an admin, attempts to list all users.
+     * @deny (update) A user tries to update another user's profile. auth.uid != userId.
+     * @principle Restricts access to a user's own data tree and prevents user enumeration.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && hasValidUserProfileId(userId);
+      allow update: if isExistingOwner(userId) && userProfileIdIsImmutable();
+      allow delete: if isExistingOwner(userId);
+
+      // -----------------------------------------------------------------------
+      // Sessions
+      // -----------------------------------------------------------------------
+
+      /**
+       * @description Manages user session documents.
+       * @path /users/{userId}/sessions/{sessionId}
+       * @allow (list) A signed-in user lists their own past sessions. auth.uid == userId.
+       * @allow (create) A signed-in user creates a new session document for themselves. auth.uid == userId.
+       * @deny (get) A user tries to get another user's session. auth.uid != userId.
+       * @deny (create) A user tries to create a session under another user's profile. auth.uid != userId.
+       * @principle Enforces strict ownership for all session data via path-based security.
+       */
+      match /sessions/{sessionId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && hasValidUserId(userId);
+        allow update: if isExistingOwner(userId) && userIdIsImmutable();
+        allow delete: if isExistingOwner(userId);
+
+        // ---------------------------------------------------------------------
+        // Messages
+        // ---------------------------------------------------------------------
+
+        /**
+         * @description Manages messages within a specific session.
+         * @path /users/{userId}/sessions/{sessionId}/messages/{messageId}
+         * @allow (list) A user lists all messages from one of their own sessions. auth.uid == userId.
+         * @allow (create) A user adds a new message to one of their own sessions. auth.uid == userId.
+         * @deny (list) A user tries to list messages from another user's session. auth.uid != userId.
+         * @deny (update) A user tries to change a message in another user's session. auth.uid != userId.
+         * @principle Inherits ownership from the parent user document, securing the entire data tree.
+         */
+        match /messages/{messageId} {
+          allow get: if isOwner(userId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && hasValidSessionId(sessionId);
+          allow update: if isExistingOwner(userId) && sessionIdIsImmutable();
+          allow delete: if isExistingOwner(userId);
+        }
+
+        // ---------------------------------------------------------------------
+        // Summary
+        // ---------------------------------------------------------------------
+        
+        /**
+         * @description Manages the single AI-generated summary document for a session.
+         * @path /users/{userId}/sessions/{sessionId}/summary
+         * @allow (get) A user retrieves the summary for their own session. auth.uid == userId.
+         * @allow (create) A summary is created for a user's own session. auth.uid == userId.
+         * @deny (get) A user tries to get the summary of another user's session. auth.uid != userId.
+         * @deny (list) Listing is denied as this is a single document path, not a collection.
+         * @principle Secures a single document using the same inherited ownership model.
+         */
+        match /summary {
+          allow get: if isOwner(userId);
+          allow list: if false;
+          allow create: if isOwner(userId) && hasValidSessionId(sessionId);
+          allow update: if isExistingOwner(userId) && sessionIdIsImmutable();
+          allow delete: if isExistingOwner(userId);
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      // Analytics
+      // -----------------------------------------------------------------------
+
+      /**
+       * @description Manages analytics data related to a user's sessions.
+       * @path /users/{userId}/analytics/{analyticsId}
+       * @allow (list) A user lists their own analytics documents. auth.uid == userId.
+       * @allow (create) A new analytics document is created for the user. auth.uid == userId.
+       * @deny (get) A user attempts to read analytics for another user. auth.uid != userId.
+       * @deny (update) A user attempts to modify another user's analytics. auth.uid != userId.
+       * @principle Ensures all analytics data is private and owned by the user.
+       */
+      match /analytics/{analyticsId} {
+        allow get: if isOwner(userId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && hasValidUserId(userId);
+        allow update: if isExistingOwner(userId) && userIdIsImmutable();
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+  }
+}
