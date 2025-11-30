@@ -14,7 +14,7 @@ type ChatHistories = Record<string, Message[]>;
 const initialMessages: ChatHistories = AI_PERSONALITIES.reduce((acc, p) => {
   acc[p.id] = [
     { id: `${p.id}-1`, role: 'user', content: 'Hey, how are you today?' },
-    { id: `${p.id}-2`, role: 'ai', content: `I am doing great! Thanks for asking. I'm your ${p.name}. How can I help you reflect today?` },
+    { id: `${p.id}-2`, role: 'ai', content: `I am doing great! I'm your ${p.name}. How can I help you reflect today?` },
   ];
   return acc;
 }, {} as ChatHistories);
@@ -40,7 +40,7 @@ export default function ChatPage() {
   const handleSendMessage = async (content: string) => {
     if (content.trim() && !isGenerating) {
       const currentMessages = allMessages[selectedPersonality] || [];
-      const newMessage = { id: (currentMessages.length + 1).toString(), role: 'user' as const, content };
+      const newMessage = { id: `${selectedPersonality}-${currentMessages.length + 1}`, role: 'user' as const, content };
       const newMessagesForPersonality = [...currentMessages, newMessage];
       
       setAllMessages(prev => ({
@@ -54,7 +54,7 @@ export default function ChatPage() {
           history: newMessagesForPersonality.map(m => ({role: m.role, content: m.content})),
           personalityId: selectedPersonality
         });
-        const aiResponse = { id: (newMessagesForPersonality.length + 1).toString(), role: 'ai' as const, content: aiResponseContent };
+        const aiResponse = { id: `${selectedPersonality}-${newMessagesForPersonality.length + 1}`, role: 'ai' as const, content: aiResponseContent };
         
         setAllMessages(prev => ({
             ...prev,

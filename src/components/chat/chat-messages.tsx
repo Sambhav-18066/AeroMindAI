@@ -16,9 +16,9 @@ export function ChatMessages({ messages, isGenerating }: ChatMessagesProps) {
   return (
     <ScrollArea className="flex-1 p-4">
       <div className="space-y-6">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
-            key={message.id}
+            key={`${message.id}-${index}`}
             className={cn(
               "flex items-start gap-4",
               message.role === 'user' ? 'justify-end' : 'justify-start'
