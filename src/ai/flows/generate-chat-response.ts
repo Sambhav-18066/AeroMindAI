@@ -7,6 +7,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { AI_PERSONALITIES } from '@/lib/data';
 
 const ChatHistorySchema = z.array(
   z.object({
@@ -15,20 +16,28 @@ const ChatHistorySchema = z.array(
   })
 );
 
+const GenerateChatResponseInputSchema = z.object({
+  history: ChatHistorySchema,
+  personalityId: z.string().optional(),
+});
+
+
 export async function generateChatResponse(
-  history: z.infer<typeof ChatHistorySchema>
+  input: z.infer<typeof GenerateChatResponseInputSchema>
 ): Promise<string> {
-  return generateChatResponseFlow(history);
+  return generateChatResponseFlow(input);
 }
 
 const generateChatResponseFlow = ai.defineFlow(
   {
     name: 'generateChatResponseFlow',
-    inputSchema: ChatHistorySchema,
+    inputSchema: GenerateChatResponseInputSchema,
     outputSchema: z.string(),
   },
-  async (history) => {
-    const systemPrompt = `You are a helpful AI assistant. Your responses should be conversational and helpful.`;
+  async ({history, personalityId}) => {
+    const personality = AI_PERSONALITIES.find(p => p.id === personalityId) ?? AI_PERSONALITIES[0];
+
+    const systemPrompt = personality.systemPrompt;
 
     const response = await ai.generate({
       prompt: [
