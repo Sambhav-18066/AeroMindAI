@@ -8,13 +8,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/
 
 interface ChatInputProps {
   onSendMessage: (content: string) => void;
+  isGenerating?: boolean;
 }
 
-export function ChatInput({ onSendMessage }: ChatInputProps) {
+export function ChatInput({ onSendMessage, isGenerating }: ChatInputProps) {
   const [inputValue, setInputValue] = useState('');
 
   const handleSend = () => {
-    if (inputValue.trim()) {
+    if (inputValue.trim() && !isGenerating) {
       onSendMessage(inputValue);
       setInputValue('');
     }
@@ -38,12 +39,13 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
+                disabled={isGenerating}
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button type="submit" size="icon" variant="ghost" className="h-9 w-9 text-primary hover:text-primary hover:bg-primary/10" onClick={handleSend} disabled={!inputValue.trim()}>
+                            <Button type="submit" size="icon" variant="ghost" className="h-9 w-9 text-primary hover:text-primary hover:bg-primary/10" onClick={handleSend} disabled={!inputValue.trim() || isGenerating}>
                                 <CornerDownLeft className="h-5 w-5" />
                             </Button>
                         </TooltipTrigger>
@@ -53,7 +55,7 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
                     </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-primary hover:text-primary hover:bg-primary/10">
+                            <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-primary hover:text-primary hover:bg-primary/10" disabled={isGenerating}>
                                 <Mic className="h-5 w-5" />
                             </Button>
                         </TooltipTrigger>
@@ -63,7 +65,7 @@ export function ChatInput({ onSendMessage }: ChatInputProps) {
                     </Tooltip>
                      <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10">
+                            <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10" disabled={isGenerating}>
                                 <Volume2 className="h-5 w-5" />
                             </Button>
                         </TooltipTrigger>

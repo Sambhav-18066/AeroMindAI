@@ -12,9 +12,10 @@ interface ChatLayoutProps {
   messages: { id: string; role: 'user' | 'ai'; content: string }[];
   personalities: AIPersonality[];
   onSendMessage: (content: string) => void;
+  isGenerating?: boolean;
 }
 
-export function ChatLayout({ messages, personalities, onSendMessage }: ChatLayoutProps) {
+export function ChatLayout({ messages, personalities, onSendMessage, isGenerating }: ChatLayoutProps) {
   return (
     <ResizablePanelGroup direction="horizontal" className="h-full max-h-[calc(100vh-8rem)] items-stretch">
       <ResizablePanel defaultSize={25} minSize={20} maxSize={30} className="hidden md:block">
@@ -25,8 +26,8 @@ export function ChatLayout({ messages, personalities, onSendMessage }: ChatLayou
       <ResizableHandle withHandle className="hidden md:flex" />
       <ResizablePanel defaultSize={75}>
         <div className="flex flex-col h-full">
-          <ChatMessages messages={messages} />
-          <ChatInput onSendMessage={onSendMessage} />
+          <ChatMessages messages={messages} isGenerating={isGenerating}/>
+          <ChatInput onSendMessage={onSendMessage} isGenerating={isGenerating} />
         </div>
       </ResizablePanel>
     </ResizablePanelGroup>
