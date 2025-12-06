@@ -39,8 +39,8 @@ const generateChatResponseFlow = ai.defineFlow(
     const personality = AI_PERSONALITIES.find(p => p.id === personalityId) ?? AI_PERSONALITIES[0];
 
     const lengthInstruction = answerLength === 'short' 
-      ? 'Please provide a short, concise answer.' 
-      : 'Please provide a detailed, long answer.';
+      ? 'Please provide a short, concise answer, with a maximum of 4 lines.' 
+      : 'Please provide a detailed, long answer, with a maximum of 8 lines.';
 
     const systemPrompt = `${personality.systemPrompt} ${lengthInstruction}`;
 
