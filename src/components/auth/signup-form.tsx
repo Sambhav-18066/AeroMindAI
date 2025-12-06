@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -5,11 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/firebase";
-import { initiateEmailSignUp } from "@/firebase/non-blocking-login";
 import { Chrome } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,10 +21,24 @@ export function SignupForm() {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
 
-    const handleSignup = (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
-        initiateEmailSignUp(auth, email, password);
-        router.push("/chat");
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            if (auth.currentUser) {
+                await updateProfile(auth.currentUser, { displayName: name });
+            }
+            if (userCredential.user) {
+                await sendEmailVerification(userCredential.user);
+            }
+            router.push("/chat");
+        } catch (error: any) {
+            toast({
+                variant: "destructive",
+                title: "Signup Failed",
+                description: error.message || "Could not create your account.",
+            });
+        }
     };
 
     const handleGoogleSignIn = async () => {
