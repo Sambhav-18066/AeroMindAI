@@ -19,6 +19,7 @@ const ChatHistorySchema = z.array(
 const GenerateChatResponseInputSchema = z.object({
   history: ChatHistorySchema,
   personalityId: z.string().optional(),
+  answerLength: z.enum(['short', 'long']).optional(),
 });
 
 
@@ -34,10 +35,14 @@ const generateChatResponseFlow = ai.defineFlow(
     inputSchema: GenerateChatResponseInputSchema,
     outputSchema: z.string(),
   },
-  async ({history, personalityId}) => {
+  async ({history, personalityId, answerLength}) => {
     const personality = AI_PERSONALITIES.find(p => p.id === personalityId) ?? AI_PERSONALITIES[0];
 
-    const systemPrompt = personality.systemPrompt;
+    const lengthInstruction = answerLength === 'short' 
+      ? 'Please provide a short, concise answer.' 
+      : 'Please provide a detailed, long answer.';
+
+    const systemPrompt = `${personality.systemPrompt} ${lengthInstruction}`;
 
     const response = await ai.generate({
       prompt: [

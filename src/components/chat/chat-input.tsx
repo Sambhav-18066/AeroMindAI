@@ -12,9 +12,10 @@ interface ChatInputProps {
   isGenerating?: boolean;
   isTtsEnabled: boolean;
   onTtsToggle: () => void;
+  disabled?: boolean;
 }
 
-export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsToggle }: ChatInputProps) {
+export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsToggle, disabled }: ChatInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
@@ -58,7 +59,7 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
   }, []);
   
   const handleSend = () => {
-    if (inputValue.trim() && !isGenerating) {
+    if (inputValue.trim() && !isGenerating && !disabled) {
       onSendMessage(inputValue);
       setInputValue('');
     }
@@ -94,13 +95,13 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                disabled={isGenerating || isRecording}
+                disabled={isGenerating || isRecording || disabled}
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button type="submit" size="icon" variant="ghost" className="h-9 w-9 text-primary hover:text-primary hover:bg-primary/10" onClick={handleSend} disabled={!inputValue.trim() || isGenerating || isRecording}>
+                            <Button type="submit" size="icon" variant="ghost" className="h-9 w-9 text-primary hover:text-primary hover:bg-primary/10" onClick={handleSend} disabled={!inputValue.trim() || isGenerating || isRecording || disabled}>
                                 <CornerDownLeft className="h-5 w-5" />
                             </Button>
                         </TooltipTrigger>
@@ -110,7 +111,7 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
                     </Tooltip>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button type="button" size="icon" variant="ghost" className={cn("h-9 w-9 text-primary hover:text-primary hover:bg-primary/10", isRecording && "bg-primary/20")} onClick={toggleRecording} disabled={isGenerating}>
+                            <Button type="button" size="icon" variant="ghost" className={cn("h-9 w-9 text-primary hover:text-primary hover:bg-primary/10", isRecording && "bg-primary/20")} onClick={toggleRecording} disabled={isGenerating || disabled}>
                                 {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
                             </Button>
                         </TooltipTrigger>
@@ -120,7 +121,7 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
                     </Tooltip>
                      <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={onTtsToggle} disabled={isGenerating}>
+                            <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-primary hover:bg-primary/10" onClick={onTtsToggle} disabled={isGenerating || disabled}>
                                 {isTtsEnabled ? <Volume2 className="h-5 w-5 text-primary" /> : <VolumeX className="h-5 w-5" />}
                             </Button>
                         </TooltipTrigger>
