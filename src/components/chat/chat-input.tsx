@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -19,6 +20,7 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const finalTranscriptRef = useRef('');
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -30,15 +32,15 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
 
       recognition.onresult = (event) => {
         let interimTranscript = '';
-        let finalTranscript = '';
         for (let i = event.resultIndex; i < event.results.length; ++i) {
+          const transcript = event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
+            finalTranscriptRef.current += transcript + ' ';
           } else {
-            interimTranscript += event.results[i][0].transcript;
+            interimTranscript += transcript;
           }
         }
-        setInputValue(finalTranscript + interimTranscript);
+        setInputValue(finalTranscriptRef.current + interimTranscript);
       };
       
       recognition.onend = () => {
@@ -62,6 +64,7 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
     if (inputValue.trim() && !isGenerating && !disabled) {
       onSendMessage(inputValue);
       setInputValue('');
+      finalTranscriptRef.current = '';
     }
   };
 
@@ -78,7 +81,7 @@ export function ChatInput({ onSendMessage, isGenerating, isTtsEnabled, onTtsTogg
     if (isRecording) {
       recognitionRef.current.stop();
     } else {
-      setInputValue('');
+      finalTranscriptRef.current = inputValue; // Preserve current text
       recognitionRef.current.start();
     }
     setIsRecording(!isRecording);
