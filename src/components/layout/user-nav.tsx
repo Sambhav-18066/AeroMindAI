@@ -73,10 +73,12 @@ export function UserNav() {
           Log out
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <div className="flex items-center justify-between px-2 py-1">
-            <span className="text-sm text-muted-foreground">Theme</span>
-            <ThemeToggle />
-        </div>
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <div className="flex items-center justify-between w-full">
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ThemeToggle />
+            </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

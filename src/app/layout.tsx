@@ -27,6 +27,7 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
+            themes={['light', 'dark', 'system', 'theme-macos', 'theme-windows-xp', 'theme-windows-7']}
           >
             <Background />
             {children}

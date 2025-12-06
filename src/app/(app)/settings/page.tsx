@@ -15,12 +15,14 @@ import { useToast } from "@/hooks/use-toast";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { doc } from "firebase/firestore";
 import { useFirestore } from "@/firebase";
+import { useTheme } from "next-themes";
 
 export default function SettingsPage() {
   const { user } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
   const { toast } = useToast();
+  const { theme, setTheme, themes } = useTheme();
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -70,11 +72,18 @@ export default function SettingsPage() {
       localStorage.setItem(`userPrefs-${user.uid}`, JSON.stringify(prefs));
       
       const userDocRef = doc(firestore, 'users', user.uid);
-      setDocumentNonBlocking(userDocRef, { preferredAiPersonality: defaultPersonality }, { merge: true });
+      setDocumentNonBlocking(userDocRef, { preferredAiPersonality: defaultPersonality, themePreference: theme }, { merge: true });
 
       toast({ title: "Preferences saved!" });
     }
   };
+
+  const formatThemeName = (themeName: string) => {
+    if (themeName.startsWith('theme-')) {
+      themeName = themeName.replace('theme-', '');
+    }
+    return themeName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
 
   return (
     <div className="mx-auto grid w-full max-w-6xl gap-2">
@@ -105,12 +114,19 @@ export default function SettingsPage() {
             <CardDescription>Customize your application experience.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Theme</Label>
-                <p className="text-sm text-muted-foreground">Select your preferred color scheme.</p>
-              </div>
-              <ThemeToggle />
+            <div className="space-y-2">
+              <Label htmlFor="theme">Theme</Label>
+              <p className="text-sm text-muted-foreground">Select your preferred color scheme.</p>
+               <Select value={theme} onValueChange={setTheme}>
+                <SelectTrigger className="w-full md:w-1/2" id="theme">
+                  <SelectValue placeholder="Select a theme" />
+                </SelectTrigger>
+                <SelectContent className="glass-effect">
+                  {themes.map(t => (
+                    <SelectItem key={t} value={t}>{formatThemeName(t)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-2">

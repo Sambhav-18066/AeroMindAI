@@ -59,6 +59,139 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  .theme-macos {
+    --background: 225 10% 97%;
+    --foreground: 240 5% 20%;
+    --card: 225 10% 97%;
+    --card-foreground: 240 5% 20%;
+    --popover: 225 10% 97%;
+    --popover-foreground: 240 5% 20%;
+    --primary: 210 100% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 10% 92%;
+    --secondary-foreground: 240 5% 20%;
+    --muted: 225 10% 92%;
+    --muted-foreground: 240 5% 40%;
+    --accent: 210 100% 56%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 225 10% 85%;
+    --input: 225 10% 85%;
+    --ring: 210 100% 56%;
+  }
+
+  .dark.theme-macos {
+    --background: 240 5% 15%;
+    --foreground: 0 0% 98%;
+    --card: 240 5% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 5% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 210 100% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 25%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 5% 25%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 210 100% 56%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 25%;
+    --input: 240 5% 25%;
+    --ring: 210 100% 56%;
+  }
+
+  .theme-windows-xp {
+    --background: 210 100% 92%;
+    --foreground: 0 0% 0%;
+    --card: 210 100% 92%;
+    --card-foreground: 0 0% 0%;
+    --popover: 210 100% 92%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 212 87% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 100% 85%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 210 100% 85%;
+    --muted-foreground: 0 0% 30%;
+    --accent: 88 85% 57%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 212 87% 48%;
+    --input: 0 0% 100%;
+    --ring: 212 87% 48%;
+  }
+
+  .dark.theme-windows-xp {
+    --background: 240 5% 15%;
+    --foreground: 0 0% 98%;
+    --card: 240 5% 15%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 5% 15%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 212 87% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 25%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 5% 25%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 88 85% 67%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 212 87% 58%;
+    --input: 240 5% 25%;
+    --ring: 212 87% 58%;
+  }
+
+  .theme-windows-7 {
+    --background: 205 60% 95%;
+    --foreground: 240 5% 20%;
+    --card: 205 60% 95%;
+    --card-foreground: 240 5% 20%;
+    --popover: 205 60% 95%;
+    --popover-foreground: 240 5% 20%;
+    --primary: 200 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 205 60% 90%;
+    --secondary-foreground: 240 5% 20%;
+    --muted: 205 60% 90%;
+    --muted-foreground: 240 5% 40%;
+    --accent: 200 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 205 60% 80%;
+    --input: 205 60% 80%;
+    --ring: 200 100% 50%;
+  }
+
+  .dark.theme-windows-7 {
+    --background: 220 15% 20%;
+    --foreground: 0 0% 98%;
+    --card: 220 15% 20%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 15% 20%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 200 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 30%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 15% 30%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 200 100% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 15% 30%;
+    --input: 220 15% 30%;
+    --ring: 200 100% 60%;
+  }
+
 }
 
 @layer base {
@@ -82,5 +215,17 @@
   .dark .glass-effect {
     background: linear-gradient(135deg, hsla(0, 0%, 100%, 0.05), hsla(0, 0%, 100%, 0));
     @apply border-white/10;
+  }
+
+  .theme-windows-7 .glass-effect {
+    background: linear-gradient(135deg, hsla(200, 100%, 80%, 0.2), hsla(200, 100%, 80%, 0.05));
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+    @apply border-white/30 shadow-2xl;
+  }
+
+  .dark.theme-windows-7 .glass-effect {
+    background: linear-gradient(135deg, hsla(200, 100%, 70%, 0.1), hsla(200, 100%, 70%, 0.02));
+    @apply border-white/20;
   }
 }
