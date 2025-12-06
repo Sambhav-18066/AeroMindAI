@@ -22,7 +22,7 @@ const textToSpeechFlow = ai.defineFlow(
   },
   async (query) => {
     const {media} = await ai.generate({
-      model: 'googleai/gemini-2.5-flash-preview-tts',
+      model: 'googleai/gemini-nano-tts',
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
